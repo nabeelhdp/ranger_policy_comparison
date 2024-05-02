@@ -6,6 +6,7 @@ import json
 
 """Set the DEBUG to 1 if you want to print every matching comparison in addition to the missing ones"""
 DEBUG = 0
+VERSION = "1.0.1"
 
 __author__ = 'nabeelmoidu'
 __version__ = '1.0.2'
@@ -56,7 +57,7 @@ def validate_policy_json(json_file):
             print("Service name on policy file", json_file, " is:", policy_file.get('policies')[0].get('service'))
             return policy_file
     except (ValueError, KeyError) as e:
-        print('Invalid json file provided. Error : %s' % e)
+        print('Invalid json file \"',json_file,'\" provided. Not an expected Ranger policy export file. Missing Key/Value : %s' % e)
         exit("Please retry with a valid file. Exiting!")
 
 def validate_file(file_path):
@@ -81,12 +82,18 @@ if __name__ == '__main__':
     ranger_policy_json_right = validate_policy_json(ranger_policy_file_right)
     print("==============================================================")
     service_info = {}
-    service_info['from'] = {}
-    service_info['to'] = {}
-    service_info['from']['policies'] = ranger_policy_json_left.get('policies')
-    service_info['to']['policies'] = ranger_policy_json_right.get('policies')
-    print("Comparing", ranger_policy_json_left['metaDataInfo']['Host name'], " against ", ranger_policy_json_right['metaDataInfo']['Host name'])
-    compare_policy_names(service_info['from']['policies'], service_info['to']['policies'])
-    print("==============================================================")
-    print("Comparing", ranger_policy_json_right['metaDataInfo']['Host name'], " against ", ranger_policy_json_left['metaDataInfo']['Host name'])
-    compare_policy_names(service_info['to']['policies'], service_info['from']['policies'])
+    service_info['left'] = {}
+    service_info['right'] = {}
+    service_info['left']['policies'] = ranger_policy_json_left.get('policies')
+    service_info['right']['policies'] = ranger_policy_json_right.get('policies')
+    service_info['left']['name'] = ranger_policy_json_left.get('policies')[0].get('service')
+    service_info['right']['name'] = ranger_policy_json_right.get('policies')[0].get('service')
+
+    if service_info['left']['name'] == service_info['right']['name']:
+        print("Comparing", ranger_policy_json_left['metaDataInfo']['Host name'], " against ", ranger_policy_json_right['metaDataInfo']['Host name'])
+        compare_policy_names(service_info['left']['policies'], service_info['right']['policies'])
+        print("==============================================================")
+        print("Comparing", ranger_policy_json_right['metaDataInfo']['Host name'], " against ", ranger_policy_json_left['metaDataInfo']['Host name'])
+        compare_policy_names(service_info['right']['policies'], service_info['left']['policies'])
+    else:
+        print ("Mismatching service names:",service_info['left']['name']," AND ",service_info['right']['name']," . Invalid policy comparison. Exiting!")
