@@ -1,10 +1,18 @@
-# Imports
+#!/usr/bin/env python3
+
 import sys
 import os.path
 import json
 
+"""Set the DEBUG to 1 if you want to print every matching comparison in addition to the missing ones"""
 DEBUG = 0
-VERSION = "1.0.1"
+
+__author__ = 'nabeelmoidu'
+__version__ = '1.0.2'
+__status__ = 'dev'
+__title__ = 'Ranger Policy Comparison'
+__url__ = 'https://github.com/nabeelhdp/ranger_policy_comparison'
+
 
 def command_validate():
     """Validate command-line arguments."""
@@ -79,5 +87,6 @@ if __name__ == '__main__':
     service_info['to']['policies'] = ranger_policy_json_right.get('policies')
     print("Comparing", ranger_policy_json_left['metaDataInfo']['Host name'], " against ", ranger_policy_json_right['metaDataInfo']['Host name'])
     compare_policy_names(service_info['from']['policies'], service_info['to']['policies'])
+    print("==============================================================")
     print("Comparing", ranger_policy_json_right['metaDataInfo']['Host name'], " against ", ranger_policy_json_left['metaDataInfo']['Host name'])
     compare_policy_names(service_info['to']['policies'], service_info['from']['policies'])
